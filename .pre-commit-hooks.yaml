@@ -11,6 +11,7 @@
     description: "Replace CRLF end-lines by LF ones before committing"
     entry: remove_crlf
     language: python
+    args: [ --allow-heredoc ]
     types: [text]
     stages: [pre-commit, pre-push, pre-merge-commit]
     minimum_pre_commit_version: "3.2.0"
@@ -28,7 +29,7 @@
     description: "Replace tabs by whitespaces before committing"
     entry: remove_tabs
     language: python
-    args: [ --whitespaces-count, '4' ]
+    args: [ --allow-heredoc, --whitespaces-count, '4' ]
     types: [text]
     exclude: (Makefile|debian/rules|.gitmodules)(\.in)?$
     stages: [pre-commit, pre-push, pre-merge-commit]
