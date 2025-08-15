@@ -9,9 +9,9 @@ def removes_tabs_in_file(filename, whitespaces_count):
 
     with open(filename, mode="wb") as file_processed:
         for line in lines:
-            expandend_line = line.expandtabs(whitespaces_count)
-            file_was_altered = file_was_altered or expandend_line != line
-            file_processed.write(expandend_line)
+            processed_line = line.expandtabs(whitespaces_count)
+            file_was_altered = file_was_altered or processed_line != line
+            file_processed.write(processed_line)
 
     return file_was_altered
 

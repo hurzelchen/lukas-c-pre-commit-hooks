@@ -1,32 +1,33 @@
 import argparse, sys
 
 
-def contains_crlf(filename):
-    with open(filename, mode="rb") as file_checked:
-        for line in file_checked.readlines():
-            if line.endswith(b"\r\n"):
-                return True
-    return False
-
-
 def removes_crlf_in_file(filename):
     with open(filename, mode="rb") as file_processed:
         lines = file_processed.readlines()
-    lines = [line.replace(b"\r\n", b"\n") for line in lines]
+
+    file_was_altered = False
+
     with open(filename, mode="wb") as file_processed:
         for line in lines:
-            file_processed.write(line)
+            processed_line = line.replace(b"\r\n", b"\n")
+            file_was_altered = file_was_altered or processed_line != line
+            file_processed.write(processed_line)
+
+    return file_was_altered
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("filenames", nargs="*", help="filenames to check")
     args = parser.parse_args(argv)
-    files_with_crlf = [f for f in args.filenames if contains_crlf(f)]
-    for file_with_crlf in files_with_crlf:
-        print(f"Removing CRLF end-lines in: {file_with_crlf}")
-        removes_crlf_in_file(file_with_crlf)
-    if files_with_crlf:
+
+    file_was_altered = False
+    for file in args.filenames:
+        if removes_crlf_in_file(file):
+            print(f"Removing CRLF end-lines in: {file}")
+            file_was_altered = True
+
+    if file_was_altered:
         print("")
         print("CRLF end-lines have been successfully removed. Now aborting the commit.")
         print(
