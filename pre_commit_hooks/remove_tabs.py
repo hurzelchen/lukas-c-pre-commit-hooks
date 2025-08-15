@@ -1,18 +1,19 @@
 import argparse, sys
 
 
-def contains_tabs(filename):
-    with open(filename, mode="rb") as file_checked:
-        return b"\t" in file_checked.read()
-
-
 def removes_tabs_in_file(filename, whitespaces_count):
     with open(filename, mode="rb") as file_processed:
         lines = file_processed.readlines()
-    lines = [line.expandtabs(whitespaces_count) for line in lines]
+
+    file_was_altered = False
+
     with open(filename, mode="wb") as file_processed:
         for line in lines:
-            file_processed.write(line)
+            expandend_line = line.expandtabs(whitespaces_count)
+            file_was_altered = file_was_altered or expandend_line != line
+            file_processed.write(expandend_line)
+
+    return file_was_altered
 
 
 def main(argv=None):
@@ -25,13 +26,16 @@ def main(argv=None):
     )
     parser.add_argument("filenames", nargs="*", help="filenames to check")
     args = parser.parse_args(argv)
-    files_with_tabs = [f for f in args.filenames if contains_tabs(f)]
-    for file_with_tabs in files_with_tabs:
-        print(
-            f"Substituting tabs in: {file_with_tabs} by {args.whitespaces_count} whitespaces"
-        )
-        removes_tabs_in_file(file_with_tabs, args.whitespaces_count)
-    if files_with_tabs:
+
+    file_was_altered = False
+    for file in args.filenames:
+        if removes_tabs_in_file(file, args.whitespaces_count):
+            print(
+                f"Substituting tabs in: {file} by {args.whitespaces_count} whitespaces"
+            )
+            file_was_altered = True
+
+    if file_was_altered:
         print("")
         print("Tabs have been successfully removed. Now aborting the commit.")
         print(
